@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Annuaire des interlocuteurs</title>
+<style>
+:root {
+  --blue:#173A63;
+  --blue2:#23588F;
+  --orange:#F28C28;
+  --bg:#F5F7FA;
+  --text:#16202A;
+  --muted:#667085;
+  --border:#E4E7EC;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
+.wrap{max-width:1050px;margin:0 auto;padding:34px 18px 50px}
+.hero{background:linear-gradient(110deg,var(--blue),var(--blue2));border-radius:18px;padding:28px 28px 24px;color:white;box-shadow:0 12px 30px rgba(23,58,99,.15)}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#ffd2a8}
+h1{margin:6px 0 8px;font-size:30px}
+.hero p{margin:0 0 22px;color:#e7edf5}
+.searchbox{display:flex;gap:10px;background:white;padding:8px;border-radius:12px}
+.searchbox input{flex:1;border:0;outline:0;padding:13px 14px;font-size:16px;border-radius:8px;color:var(--text)}
+.searchbox button{border:0;background:var(--orange);color:white;padding:0 18px;border-radius:8px;font-weight:700;cursor:pointer}
+.meta{display:flex;justify-content:space-between;gap:15px;align-items:center;margin:22px 2px 12px;color:var(--muted);font-size:14px}
+.pills{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 18px}
+.pill{border:1px solid var(--border);background:white;border-radius:999px;padding:7px 11px;font-size:13px;cursor:pointer;color:#344054}
+.pill:hover{border-color:#b9c4d0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:14px}
+.card{background:white;border:1px solid var(--border);border-radius:14px;padding:17px;box-shadow:0 3px 10px rgba(16,24,40,.04)}
+.company{font-size:12px;font-weight:800;letter-spacing:.06em;color:var(--orange);text-transform:uppercase;margin-bottom:9px}
+.name{font-size:18px;font-weight:800;margin-bottom:5px;color:var(--blue)}
+.role{font-size:14px;line-height:1.4;color:#475467;min-height:20px;margin-bottom:13px}
+.contact{display:flex;flex-direction:column;gap:7px;font-size:14px}
+.contact a{color:#245b92;text-decoration:none;word-break:break-word}
+.contact a:hover{text-decoration:underline}
+.empty{background:white;border:1px dashed #cfd6df;border-radius:14px;padding:28px;text-align:center;color:var(--muted)}
+.count strong{color:var(--blue)}
+@media(max-width:600px){
+  h1{font-size:24px}
+  .hero{padding:22px 18px}
+  .searchbox{display:block}
+  .searchbox button{width:100%;height:42px;margin-top:7px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="hero">
+    <div class="eyebrow">Annuaire partenaires</div>
+    <h1>Nos interlocuteurs</h1>
+    <p>Recherchez une compagnie pour afficher immédiatement les interlocuteurs associés.</p>
+    <div class="searchbox">
+      <input id="q" type="search" placeholder="Ex. AIG, Generali, GFA, Hiscox…" autocomplete="off">
+      <button id="clearBtn" type="button">Effacer</button>
+    </div>
+  </section>
+
+  <div class="meta">
+    <div class="count" id="count"></div>
+    <div>Recherche instantanée</div>
+  </div>
+
+  <div class="pills" id="pills"></div>
+  <div class="grid" id="results"></div>
+</div>
+
+<script>
+const DATA = [{"compagnie": "AIG", "nom": "DESALBRES Antoine", "role": "Souscripteur Dommage", "mail": "antoine.desalbres@aig.com", "tel": "", "portable": ""}, {"compagnie": "AIG", "nom": "MOUFFLIER Alicia", "role": "Chargée de Comptes Dommages aux biens / Aviation", "mail": "alicia.moufflier@aig.com", "tel": "+ 33 01 49 02 43 32", "portable": ""}, {"compagnie": "AIG", "nom": "CASBONNE Valérie", "role": "Responsable Développement et Relation Courtage", "mail": "apporteur.proximite@aig.com", "tel": "", "portable": ""}, {"compagnie": "AIG", "nom": "", "role": "", "mail": "gestion.pme@aig.com", "tel": "", "portable": ""}, {"compagnie": "ALLIANZ", "nom": "JOSEPH-MONDESIR Natacha", "role": "Responsable Service Souscription et Gestion ABR (Martinique)", "mail": "natacha.joseph-mondesir@allianz.com", "tel": "", "portable": "06 90 35 20 25"}, {"compagnie": "ALLIANZ", "nom": "GIBERT Coralie", "role": "Responsable Réseaux Outre-mer", "mail": "coralie.gibert@allianz.fr", "tel": "", "portable": "07 64 47 13 63"}, {"compagnie": "ALLIANZ", "nom": "GAULTIER Bruno", "role": "Inspecteur", "mail": "bruno.gaultier_2@allianz.fr", "tel": "", "portable": ""}, {"compagnie": "ALLIANZ", "nom": "", "role": "Service Souscription 972", "mail": "souscription.ameriques@sami-allianz.fr", "tel": "", "portable": ""}, {"compagnie": "ALLIANZ", "nom": "", "role": "Service Souscription contrat à la carte", "mail": "dabompa@sami-allianz.fr", "tel": "", "portable": ""}, {"compagnie": "AMOM", "nom": "LERIDER Auriane", "role": "Chargé de Clientele", "mail": "lerider.a@assurance-outremer.fr", "tel": "", "portable": "06 96 05 63 51"}, {"compagnie": "AMOM", "nom": "COAT Thierry", "role": "Directeur Général", "mail": "coat.t@assurance-outremer.fr", "tel": "", "portable": ""}, {"compagnie": "AMOM", "nom": "LEVERT Hermann", "role": "Gestionnaire de comptes", "mail": "h.levert@assurance-outremer.fr", "tel": "05 96 73 09 70", "portable": ""}, {"compagnie": "AXA", "nom": "WILLE Gregory", "role": "", "mail": "gregory.wille@axa.fr", "tel": "", "portable": "06 62 88 19 69"}, {"compagnie": "AXA", "nom": "", "role": "", "mail": "service.engagementagcaraibes@axa.fr", "tel": "", "portable": ""}, {"compagnie": "AXA XL", "nom": "AMOS James", "role": "Directeur Souscription Marine", "mail": "james.amos@axaxl.com", "tel": "", "portable": ""}, {"compagnie": "AXA XL", "nom": "DAUGER Thomas", "role": "Responsable de la Souscription", "mail": "Thomas.DAUGER@axaxl.com", "tel": "", "portable": ""}, {"compagnie": "BEAZLEY", "nom": "VEZIA Axelle", "role": "", "mail": "Axelle.vezia@beazley.com", "tel": "", "portable": ""}, {"compagnie": "BEAZLEY", "nom": "", "role": "", "mail": "myBeazleySupport@beazley.com", "tel": "", "portable": ""}, {"compagnie": "BEAZLEY", "nom": "MICHELON Marie-Eve", "role": "Responsable de la Souscription", "mail": "marie-eve.michelon@beazley.com", "tel": "", "portable": "06 85 80 26 05"}, {"compagnie": "BEAZLEY", "nom": "", "role": "Comptabilité", "mail": "bidaccreditcontrol.france@beazley.com", "tel": "", "portable": ""}, {"compagnie": "CHUBB", "nom": "BUISSON Luca", "role": "Souscripteur Cyber", "mail": "Luca.buisson@chubb.com", "tel": "", "portable": "06 15 97 82 89"}, {"compagnie": "CHUBB", "nom": "GODON Sabrina", "role": "Responsable Développpement Courtage", "mail": "sabrina.godon@chubb.com", "tel": "", "portable": "06 07 38 90 36"}, {"compagnie": "CHUBB", "nom": "BENAKNIN Nathalie", "role": "Directrice des Régions", "mail": "nathalie.benaknin@chubb.com", "tel": "", "portable": ""}, {"compagnie": "Diot-Siaci A&S (Assurance et Souscription)", "nom": "CLAESEN Yves", "role": "Directeur Général", "mail": "Yves.claesen@diot.siaci.com", "tel": "", "portable": "06 27 54 57 22"}, {"compagnie": "ERGO", "nom": "MOBEEN Mohammad", "role": "Directeur Transport & Spécialités", "mail": "mobeen.mohammad@ergo-industrial.fr", "tel": "01 42 36 14 00", "portable": ""}, {"compagnie": "ERGO", "nom": "Iris Iordan", "role": "Directeur Responsabilité civile & Construction", "mail": "iris.iordan@ergo-industrial.fr", "tel": "01 40 28 12 24", "portable": ""}, {"compagnie": "ERGO", "nom": "RIVIERE Pierric", "role": "Directeur Adjoint Souscription Responsabilité Civile", "mail": "pierric.riviere@ergo-industrial.fr", "tel": "", "portable": "06 33 26 19 94"}, {"compagnie": "ERGO", "nom": "OCULI Grégory", "role": "Directeur Adjoint Construction", "mail": "construction@ergo-industrial.fr", "tel": "01 42 36 14 01", "portable": ""}, {"compagnie": "ERGO", "nom": "", "role": "Comptabilité", "mail": "compta@ergo-industrial.fr", "tel": "01 42 36 24 45", "portable": ""}, {"compagnie": "ERGO", "nom": "", "role": "Indemnisation", "mail": "sinistres@ergo-industrial.fr", "tel": "01 42 36 16 91", "portable": ""}, {"compagnie": "GENERALI", "nom": "", "role": "Souscription Risque Industriel", "mail": "Souscription.Nord.RisqueIndustriel@generali.fr", "tel": "", "portable": ""}, {"compagnie": "GENERALI", "nom": "", "role": "Souscription Responsabilite Civile", "mail": "Souscription.Nord.ResponsabiliteCivile@generali.fr", "tel": "", "portable": ""}, {"compagnie": "GENERALI", "nom": "", "role": "Souscription Flotte", "mail": "souscription.Nord.Flotte@generali.fr", "tel": "", "portable": ""}, {"compagnie": "GENERALI", "nom": "", "role": "Gestion Responsabilité Civile", "mail": "gestion.nord.responsabilitécivile@generali.fr", "tel": "", "portable": ""}, {"compagnie": "GENERALI", "nom": "", "role": "Gestion Risque Industriel", "mail": "gestion.nord.risqueindustriel@generali.fr", "tel": "", "portable": ""}, {"compagnie": "GENERALI", "nom": "", "role": "Gestion Flotte", "mail": "gestion.nord.flotte@generali.fr", "tel": "", "portable": ""}, {"compagnie": "GENERALI", "nom": "YBERT Christophe", "role": "Inspecteur Souscripteur Entreprise", "mail": "Christophe.ybert@generali.com", "tel": "", "portable": "06 20 49 87 12"}, {"compagnie": "GENERALI", "nom": "AKHALOUI Moustapha", "role": "Développement Commercial Courtage IARD", "mail": "moustapha.akhaloui@generali.com", "tel": "01 58 38 76 74", "portable": "07 61 64 85 46"}, {"compagnie": "GENERALI", "nom": "JMAATOU Naima", "role": "Souscripteur Flotte et Auto Mission", "mail": "Naima.JMAATOU@Generali.com", "tel": "01 58 38 82 44", "portable": ""}, {"compagnie": "GFA", "nom": "ARTHEIN Yann", "role": "Responsable Technico-commercial IARD", "mail": "y.arthein@gfa-caraibes.fr", "tel": "", "portable": "06 90 68 62 44"}, {"compagnie": "GFA", "nom": "MARCELLI Stéphane", "role": "Directeur Général", "mail": "s.marcelli@gfa-caraibes.fr", "tel": "", "portable": ""}, {"compagnie": "GFA", "nom": "CHARLES-FERRATY Mylène", "role": "Responsable Technico-Commercial Martinique", "mail": "m.charles@gfa-caraibes.fr", "tel": "", "portable": "06 96 24 64 28"}, {"compagnie": "GFA", "nom": "DUVAL Sylvie", "role": "Animation des Agents et Courtiers de la Martinique", "mail": "s.duval@gfa-caraibes.fr", "tel": "", "portable": "06 96 77 64 13"}, {"compagnie": "GFA", "nom": "BERTHOLO Eric", "role": "Responsable du Recouvrement", "mail": "e.bertholo@gfa-caraibes.fr", "tel": "0596 59 04 22", "portable": "06 96 94 68 65"}, {"compagnie": "GFA", "nom": "LAIGLE - LOUVOUNOU Marie-Christel", "role": "Contrôleur Recouvrement", "mail": "mc.laigle-louvounou@gfa-caraibes.fr", "tel": "05 96 59 04 21", "portable": ""}, {"compagnie": "GFA", "nom": "SALMERON Yannick", "role": "Responsable Santé Antilles Guyane", "mail": "y.salmeron@gfa-caraibes.fr", "tel": "0590 38 30 42", "portable": "06 90 39 87 02"}, {"compagnie": "GFA", "nom": "", "role": "Souscription technique 972", "mail": "souscriptiontechnique972@gfa-caraibes.fr", "tel": "", "portable": ""}, {"compagnie": "GFA", "nom": "ZOBEIDE Aurélie", "role": "Soucription technique (bris de machine)", "mail": "aurelie.zobeide@gfa-caraibes.fr", "tel": "05 94 25 63 33", "portable": ""}, {"compagnie": "GFA", "nom": "FRANÇOIS-CHRISTOPHE Joëlle", "role": "Soucription technique", "mail": "j.francois@gfa-caraibes.fr", "tel": "05 96 63 80 04", "portable": "06 96 20 12 71"}, {"compagnie": "GFA", "nom": "SORRENTE Karine", "role": "Soucription technique", "mail": "k.sorrente@gfa-caraibes.fr", "tel": "05 96 59 04 08", "portable": "06 96 96 15 93"}, {"compagnie": "GFA", "nom": "RIEUX Axelle", "role": "Soucription technique", "mail": "a.rieux@gfa-caraibes.fr", "tel": "05 96 59 04 26", "portable": "06 96 96 14 99"}, {"compagnie": "GFA", "nom": "", "role": "Souscription technique 971", "mail": "souscriptiontechnique971@gfa-caraibes.fr", "tel": "", "portable": ""}, {"compagnie": "GFA", "nom": "ZEMIRLI Vincent", "role": "Souscription technique 973", "mail": "souscription973@gfa-caraibes.fr", "tel": "", "portable": ""}, {"compagnie": "Groupama Antilles-Guyane", "nom": "IVRISSE Danelle", "role": "", "mail": "danelle.ivrisse@groupama-ag.fr", "tel": "", "portable": ""}, {"compagnie": "Groupama Antilles-Guyane", "nom": "FILLOL Olivier", "role": "Responsable développement", "mail": "olivier.fillol@groupama-ag.fr", "tel": "", "portable": "06 96 36 83 00"}, {"compagnie": "Groupama Antilles-Guyane", "nom": "CATORC Carole", "role": "", "mail": "carole.catorc@groupama-ag.fr", "tel": "", "portable": ""}, {"compagnie": "Groupama Antilles-Guyane", "nom": "FLORIMOND Rosine", "role": "Chargée des Activités Déléguées et Fraude Interne", "mail": "rosine.florimond@groupama-ag.fr", "tel": "", "portable": ""}, {"compagnie": "Groupama Antilles-Guyane", "nom": "RADJOUKI Aurelie", "role": "Chargé des courtiers", "mail": "aurelie.radjouki@groupama-ag.fr", "tel": "", "portable": "06 90 99 29 20"}, {"compagnie": "Groupama Antilles-Guyane", "nom": "MACEUS Rebecca", "role": "Assistante commerciale du département développement", "mail": "Rebecca.Maceus@groupama-ag.fr", "tel": "0596 10 65 79", "portable": ""}, {"compagnie": "Groupama Antilles-Guyane", "nom": "", "role": "Service souscription Entreprise et Collectivités", "mail": "souscription@groupama-ag.fr", "tel": "", "portable": ""}, {"compagnie": "Groupama Antilles-Guyane", "nom": "", "role": "Service souscription Pro et Particulier", "mail": "souscription_pro@groupama-ag.fr", "tel": "", "portable": ""}, {"compagnie": "HISCOX", "nom": "BOUCHNAIF Laetitia", "role": "", "mail": "Laetitia.Bouchnaif@HISCOX.com", "tel": "", "portable": ""}, {"compagnie": "HISCOX", "nom": "ORHA Cristina", "role": "Souscriptrice", "mail": "cristina.orha@hiscox.com", "tel": "", "portable": ""}, {"compagnie": "HISCOX", "nom": "BERNARD Evan", "role": "Chef de projet", "mail": "evan.bernard@hiscox.com", "tel": "", "portable": ""}, {"compagnie": "HISCOX", "nom": "MANGUIN Mathias", "role": "Responsable commercial", "mail": "mathias.manguin@hiscox.com", "tel": "", "portable": ""}, {"compagnie": "INFASS ( logiciel AssTra)", "nom": "BESNOU Cyril", "role": "", "mail": "c.besnou@infass.com", "tel": "", "portable": ""}, {"compagnie": "LIBERTY", "nom": "MARI Françoise", "role": "Directrice lignes financières", "mail": "francoise.mari@libertyglobalgroup.com", "tel": "", "portable": ""}, {"compagnie": "DATTAK", "nom": "BRUNELLE Augustin", "role": "Directeur Régional Nord Est", "mail": "augustin.brunelle@dattak.io", "tel": "", "portable": "06 21 79 89 93"}, {"compagnie": "DIOT-SIACI CORPORATE SOLUTIONS (DSCS)", "nom": "MESSEAN Jeremy", "role": "MidMarket", "mail": "jeremy.messean@diot-siaci.com", "tel": "", "portable": ""}, {"compagnie": "DIOT-SIACI CORPORATE SOLUTIONS (DSCS)", "nom": "MERCELAT Delphine", "role": "Professions Réglementées & Réassurance", "mail": "dmercelat@lsngroupe.com", "tel": "", "portable": ""}, {"compagnie": "DIOT-SIACI CORPORATE SOLUTIONS (DSCS)", "nom": "LALO Brigitte", "role": "Développement international", "mail": "brigitte.lalo@s2hgroup.com", "tel": "", "portable": ""}, {"compagnie": "DIOT-SIACI CORPORATE SOLUTIONS (DSCS)", "nom": "GRAEFF Fabien", "role": "Analytics & Transfert Alternatif de Risques (ART)", "mail": "fabien.graeff@s2hgroup.com", "tel": "", "portable": ""}, {"compagnie": "DIOT-SIACI CORPORATE SOLUTIONS (DSCS)", "nom": "SILVA Raimundo", "role": "Construction et Énergies", "mail": "raimundo.silva@s2hgroup.com", "tel": "", "portable": ""}, {"compagnie": "DIOT-SIACI CORPORATE SOLUTIONS (DSCS)", "nom": "ROMET Matthieu", "role": "Dommages aux Biens", "mail": "mromet@diot.com", "tel": "", "portable": ""}, {"compagnie": "DIOT-SIACI CORPORATE SOLUTIONS (DSCS)", "nom": "THOMANN Claude", "role": "Flottes Automobiles", "mail": "cthomann@diot.com", "tel": "", "portable": ""}, {"compagnie": "DIOT-SIACI CORPORATE SOLUTIONS (DSCS)", "nom": "MUHR Florence", "role": "Individuelle Accident", "mail": "fmuhr@diot.com", "tel": "", "portable": ""}, {"compagnie": "DIOT-SIACI CORPORATE SOLUTIONS (DSCS)", "nom": "JAUREGUI Emmanuel", "role": "Prévention", "mail": "emmanuel.jauregui@s2hgroup.com", "tel": "", "portable": ""}, {"compagnie": "DIOT-SIACI CORPORATE SOLUTIONS (DSCS)", "nom": "YALAP Stiv", "role": "Réassurance Facultative", "mail": "stiv.yalap@s2hgroup.com", "tel": "", "portable": ""}, {"compagnie": "DIOT-SIACI CORPORATE SOLUTIONS (DSCS)", "nom": "BERNARD Audrey", "role": "Responsabilité Civile et Environnement", "mail": "abernard@diot.com", "tel": "", "portable": ""}, {"compagnie": "DIOT-SIACI CORPORATE SOLUTIONS (DSCS)", "nom": "GAVARONE Alexandra", "role": "Risques Financiers", "mail": "alexandra.gavarone@s2hgroup.com", "tel": "", "portable": ""}, {"compagnie": "DIOT-SIACI CORPORATE SOLUTIONS (DSCS)", "nom": "DUSSAUSSOIS Stephanie", "role": "Violences Politiques et Terrorisme (PVT)", "mail": "sdussaussois@diot.com", "tel": "", "portable": ""}, {"compagnie": "DIOT-SIACI IMMOBILIER", "nom": "Sylvie THEVIER", "role": "Flotte Auto", "mail": "sthevier@diot.com", "tel": "", "portable": ""}, {"compagnie": "DIOT-SIACI IMMOBILIER", "nom": "Sylvie THEVIER", "role": "Auto Mission", "mail": "sthevier@diot.com", "tel": "", "portable": ""}, {"compagnie": "DIOT-SIACI IMMOBILIER", "nom": "Carine LAPLACE", "role": "RC des dirigeants", "mail": "claplace@diot.com", "tel": "", "portable": ""}, {"compagnie": "DIOT-SIACI IMMOBILIER", "nom": "Carine LAPLACE", "role": "RCMO", "mail": "claplace@diot.com", "tel": "", "portable": ""}, {"compagnie": "DIOT-SIACI IMMOBILIER", "nom": "Carine LAPLACE", "role": "RC PRO", "mail": "claplace@diot.com", "tel": "", "portable": ""}, {"compagnie": "DIOT-SIACI IMMOBILIER", "nom": "Carine LAPLACE", "role": "RC Propriétaire d'immeubles", "mail": "claplace@diot.com", "tel": "", "portable": ""}, {"compagnie": "DIOT-SIACI IMMOBILIER", "nom": "Carine LAPLACE", "role": "Bailleurs publics et privés, foncières, institutionnels, sociétés de gestion de portefeuille, gérants de SCPI-OPCI", "mail": "claplace@diot.com", "tel": "", "portable": ""}, {"compagnie": "DIOT-SIACI IMMOBILIER", "nom": "Carine LAPLACE", "role": "Syndics et Gérants", "mail": "claplace@diot.com", "tel": "", "portable": ""}, {"compagnie": "DIOT-SIACI IMMOBILIER", "nom": "Carine LAPLACE", "role": "Administrateurs de Biens", "mail": "claplace@diot.com", "tel": "", "portable": ""}, {"compagnie": "DIOT-SIACI IMMOBILIER", "nom": "Geoffrey DELATTRE", "role": "Promoteur", "mail": "gdelattre@diot.com", "tel": "", "portable": ""}, {"compagnie": "DIOT-SIACI IMMOBILIER", "nom": "Geoffrey DELATTRE", "role": "Entreprise et Maître d’ouvrage public", "mail": "gdelattre@diot.com", "tel": "", "portable": ""}, {"compagnie": "DIOT-SIACI IMMOBILIER", "nom": "Geoffrey DELATTRE", "role": "Constructeur, Architecte, Maître d’œuvre, bureau d’étude, Bureau de contrôle, Assistant à Maitrise d’Ouvrage et tout professionnel de l’ingénierie", "mail": "gdelattre@diot.com", "tel": "", "portable": ""}, {"compagnie": "DIOT-SIACI IMMOBILIER", "nom": "Geoffrey DELATTRE", "role": "Tous Risques Chantier", "mail": "gdelattre@diot.com", "tel": "", "portable": ""}, {"compagnie": "DIOT-SIACI IMMOBILIER", "nom": "Geoffrey DELATTRE", "role": "Tous Risques Montage-Essais", "mail": "gdelattre@diot.com", "tel": "", "portable": ""}, {"compagnie": "DIOT-SIACI IMMOBILIER", "nom": "Geoffrey DELATTRE", "role": "Responsabilité Civile Atteinte à l’environnement", "mail": "gdelattre@diot.com", "tel": "", "portable": ""}, {"compagnie": "DIOT-SIACI IMMOBILIER", "nom": "Geoffrey DELATTRE", "role": "Dommages-Ouvrage", "mail": "gdelattre@diot.com", "tel": "", "portable": ""}, {"compagnie": "DIOT-SIACI IMMOBILIER", "nom": "Geoffrey DELATTRE", "role": "Constructeur Non Réalisateur", "mail": "gdelattre@diot.com", "tel": "", "portable": ""}, {"compagnie": "DIOT-SIACI IMMOBILIER", "nom": "Geoffrey DELATTRE", "role": "Contrat Collectif de Responsabilité Décennale", "mail": "gdelattre@diot.com", "tel": "", "portable": ""}, {"compagnie": "DIOT-SIACI IMMOBILIER", "nom": "Geoffrey DELATTRE", "role": "Responsabilité Civile Décennale", "mail": "gdelattre@diot.com", "tel": "", "portable": ""}, {"compagnie": "DIOT-SIACI IMMOBILIER", "nom": "Geoffrey DELATTRE", "role": "Responsabilité Civile du Promoteur", "mail": "gdelattre@diot.com", "tel": "", "portable": ""}, {"compagnie": "DIOT-SIACI IMMOBILIER", "nom": "Geoffrey DELATTRE", "role": "Garantie Financière d’Achèvement", "mail": "gdelattre@diot.com", "tel": "", "portable": ""}, {"compagnie": "DIOT-SIACI IMMOBILIER", "nom": "Carine LAPLACE", "role": "Protection du chef d’entreprise", "mail": "claplace@diot.com", "tel": "", "portable": ""}, {"compagnie": "DIOT-SIACI IMMOBILIER", "nom": "Carine LAPLACE", "role": "Assurances collectives : santé, prévoyance, retraite, indemnités de fin de carrière", "mail": "claplace@diot.com", "tel": "", "portable": ""}, {"compagnie": "DIOT-SIACI IMMOBILIER", "nom": "Carine LAPLACE", "role": "Protection des expatriés et missions internationales", "mail": "claplace@diot.com", "tel": "", "portable": ""}, {"compagnie": "DIOT-SIACI IMMOBILIER", "nom": "Carine LAPLACE", "role": "Prévention au travail", "mail": "claplace@diot.com", "tel": "", "portable": ""}, {"compagnie": "DIOT-SIACI IMMOBILIER", "nom": "Carine LAPLACE", "role": "Evolution du taux Accident du Travail", "mail": "claplace@diot.com", "tel": "", "portable": ""}, {"compagnie": "DIOT-SIACI MÉDITERRANÉE", "nom": "Philippe CHAUCHE", "role": "Transport Public de Voyageurs", "mail": "pchauche@diot.com", "tel": "", "portable": ""}, {"compagnie": "DIOT-SIACI GLOBAL MARKETS (DSGM) - Londres", "nom": "Julien COMBEAU", "role": "", "mail": "julien.combeau@s2hgroup.com", "tel": "", "portable": ""}, {"compagnie": "DIOT-SIACI GLOBAL PARTNERS", "nom": "Annabelle GREL", "role": "", "mail": "annabelle.grel@s2hgroup.com", "tel": "", "portable": ""}, {"compagnie": "APRIL", "nom": "GABEZ Sebastien", "role": "Directeur Général", "mail": "sebastien.gabez@aprilcaraibe.fr", "tel": "06 90 43 99 42", "portable": ""}, {"compagnie": "APRIL", "nom": "ARGYRE Arlette", "role": "Directeur Regional ANTILLES-GUYANE", "mail": "arlette.argyre@april.com", "tel": "06 96 80 66 00", "portable": ""}, {"compagnie": "OCEALIZ", "nom": "JACQUET CRETIDES Béatrice", "role": "Chargé de Clientele", "mail": "contact@ocealiz.fr", "tel": "05 90 22 78 71", "portable": ""}, {"compagnie": "OCEALIZ", "nom": "MILNE Boris", "role": "Responsable du Développement Commercial", "mail": "boris.milne@ocealiz.fr", "tel": "06 90 31 04 33", "portable": ""}, {"compagnie": "OCEALIZ", "nom": "SIFRAN SINNAN Elodie", "role": "Animatrice Commerciale", "mail": "elodie.sifran-sinnan@ocealiz.fr", "tel": "06 90 33 64 09", "portable": ""}];
+const q = document.getElementById('q');
+const results = document.getElementById('results');
+const count = document.getElementById('count');
+const pills = document.getElementById('pills');
+
+function norm(s) {
+  return (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
+}
+function esc(s) {
+  return (s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+}
+function telHref(s) {
+  return 'tel:' + (s || '').replace(/[^+\d]/g,'');
+}
+function render() {
+  const query = norm(q.value);
+  const filtered = query ? DATA.filter(x => norm(x.compagnie).includes(query)) : [];
+
+  count.innerHTML = query
+    ? `<strong>${filtered.length}</strong> interlocuteur${filtered.length>1?'s':''} trouvé${filtered.length>1?'s':''}`
+    : `Saisissez le nom d'une compagnie`;
+
+  if (!query) {
+    results.innerHTML = `<div class="empty">Commencez à saisir le nom d'une compagnie pour afficher les contacts.</div>`;
+    return;
+  }
+
+  if (!filtered.length) {
+    results.innerHTML = `<div class="empty">Aucun interlocuteur trouvé pour « ${esc(q.value)} ».</div>`;
+    return;
+  }
+
+  results.innerHTML = filtered.map(x => {
+    const label = x.nom || x.role || 'Contact / Service';
+    const role = x.nom ? x.role : '';
+    const details = [
+      x.mail ? `<a href="mailto:${esc(x.mail)}">✉ ${esc(x.mail)}</a>` : '',
+      x.tel ? `<a href="${telHref(x.tel)}">☎ ${esc(x.tel)}</a>` : '',
+      x.portable ? `<a href="${telHref(x.portable)}">📱 ${esc(x.portable)}</a>` : ''
+    ].filter(Boolean).join('');
+    return `<article class="card">
+      <div class="company">${esc(x.compagnie)}</div>
+      <div class="name">${esc(label)}</div>
+      ${role ? `<div class="role">${esc(role)}</div>` : `<div class="role"></div>`}
+      <div class="contact">${details}</div>
+    </article>`;
+  }).join('');
+}
+
+const companies = [...new Set(DATA.map(x => x.compagnie).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'fr'));
+pills.innerHTML = companies.map(c => `<button class="pill" type="button" data-company="${esc(c)}">${esc(c)}</button>`).join('');
+pills.addEventListener('click', e => {
+  if (e.target.classList.contains('pill')) {
+    q.value = e.target.dataset.company;
+    render();
+    q.focus();
+  }
+});
+q.addEventListener('input', render);
+document.getElementById('clearBtn').addEventListener('click', () => {
+  q.value=''; render(); q.focus();
+});
+render();
+</script>
+</body>
+</html>
